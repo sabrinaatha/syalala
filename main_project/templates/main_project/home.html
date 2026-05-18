@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="en">
+{% load static %}
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My CV</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        :root {
+            --navy-dark: #0D2137;
+            --navy: #1A3A5C;
+            --blue: #2E6DA4;
+            --gold: #D4A017;
+            --beige: #F5E6C0;
+            --white: #FFFFFF;
+        }
+        
+        .gradient-primary {
+            background: linear-gradient(135deg, var(--navy-dark), var(--navy));
+        }
+        
+        .gradient-secondary {
+            background: linear-gradient(135deg, var(--blue), var(--gold));
+        }
+        
+        .text-primary { color: var(--navy-dark); }
+        .text-secondary { color: var(--blue); }
+        .text-accent { color: var(--gold); }
+        
+        .bg-primary { background-color: var(--navy-dark); }
+        .bg-secondary { background-color: var(--navy); }
+        .bg-tertiary { background-color: var(--blue); }
+        .bg-accent { background-color: var(--gold); }
+        .bg-light { background-color: var(--beige); }
+        
+        .border-primary { border-color: var(--navy-dark); }
+        .border-secondary { border-color: var(--blue); }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes slideInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        @keyframes pulse-custom {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(46, 109, 164, 0.7); }
+            50% { box-shadow: 0 0 0 10px rgba(46, 109, 164, 0); }
+        }
+        
+        .animate-fadeInUp {
+            animation: fadeInUp 0.6s ease-out;
+        }
+        
+        .animate-slideInLeft {
+            animation: slideInLeft 0.6s ease-out;
+        }
+        
+        .animate-pulse-custom {
+            animation: pulse-custom 2s infinite;
+        }
+        
+        .hover-lift {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .hover-lift:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 25px rgba(13, 33, 55, 0.2);
+        }
+        
+        .smooth-transition {
+            transition: all 0.3s ease;
+        }
+        
+        .nav-link {
+            position: relative;
+            padding: 0.5rem 0;
+        }
+        
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background-color: var(--gold);
+            transition: width 0.3s ease;
+        }
+        
+        .nav-link:hover::after {
+            width: 100%;
+        }
+    </style>
+</head>
+<body class="bg-white" style="background-color: var(--beige)">
+    {% include 'main_project/navbar.html' %}
+
+    <!-- Head Section -->
+    <section id="home" class="gradient-primary text-white py-12 sm:py-20 lg:py-32">
+        <div class="container mx-auto px-4 sm:px-6">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
+                <div class="animate-fadeInUp">
+                    <h1 class="text-4xl sm:text-5xl lg:text-6xl font-bold mb-4 leading-tight">
+                        Hi, I'm <span style="color: var(--gold);">Sabrina</span>
+                    </h1>
+                    <p class="text-lg sm:text-xl mb-4 opacity-90">Analyst, Developer, and Data Person</p>
+                    <p class="text-base sm:text-lg mb-8 opacity-80">
+                        Not just one thing. I analyze, I code, I dig into data, and sometimes all three at once. This is a collection of projects that came out of that chaos.
+                    </p>
+                    <div class="flex flex-col sm:flex-row gap-4">
+                        <button class="px-6 sm:px-8 py-3 rounded-lg font-bold hover-lift smooth-transition" style="background-color: var(--gold); color: var(--navy-dark);">
+                            View My Work
+                        </button>
+                        <button class="px-6 sm:px-8 py-3 rounded-lg font-bold hover-lift smooth-transition border-2 border-white hover:bg-white hover:text-blue-900 smooth-transition">
+                            Get In Touch
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="animate-slideInLeft hidden lg:block">
+                    <img src="{% static 'main_project/images/image_pp.png' %}" alt="Profile Picture" class="w-80 h-80 rounded-lg object-cover shadow-lg border-4" style="border-color: var(--gold);">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="py-12 sm:py-20 lg:py-32 bg-white">
+        <div class="container mx-auto px-4 sm:px-6">
+            <h2 class="text-4xl sm:text-5xl font-bold text-primary mb-12 text-center">About Me</h2>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
+                <!-- About Content -->
+                <div class="space-y-6">
+                    <div class="hover-lift p-6 rounded-lg border-2" style="border-color: var(--navy);">
+                        <h3 class="text-2xl font-bold text-secondary mb-4">Who I Am</h3>
+                        <p class="text-gray-700 text-base sm:text-lg leading-relaxed mb-4">
+                            I'm a dedicated web developer with 3+ years of experience in building modern web applications. 
+                            My passion lies in creating beautiful user experiences combined with robust backend solutions.
+                        </p>
+                        <p class="text-gray-700 text-base sm:text-lg leading-relaxed">
+                            I specialize in Django, Python, and front-end technologies. I love solving complex problems and 
+                            continuously learning new technologies to stay ahead in the ever-evolving tech landscape.
+                        </p>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="p-4 rounded-lg hover-lift smooth-transition" style="background-color: var(--light);">
+                            <h4 class="font-bold text-secondary text-lg">15+</h4>
+                            <p class="text-gray-600">Projects Completed</p>
+                        </div>
+                        <div class="p-4 rounded-lg hover-lift smooth-transition" style="background-color: var(--light);">
+                            <h4 class="font-bold text-secondary text-lg">50+</h4>
+                            <p class="text-gray-600">Happy Clients</p>
+                        </div>
+                        <div class="p-4 rounded-lg hover-lift smooth-transition" style="background-color: var(--light);">
+                            <h4 class="font-bold text-secondary text-lg">3+</h4>
+                            <p class="text-gray-600">Years Experience</p>
+                        </div>
+                        <div class="p-4 rounded-lg hover-lift smooth-transition" style="background-color: var(--light);">
+                            <h4 class="font-bold text-secondary text-lg">8+</h4>
+                            <p class="text-gray-600">Tech Skills</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Skills Box -->
+                <div style="background-color: var(--light);" class="rounded-lg p-8 hover-lift">
+                    <h3 class="text-2xl font-bold text-primary mb-8">Core Skills</h3>
+                    
+                    <!-- Skill 1 -->
+                    <div class="mb-6">
+                        <div class="flex justify-between mb-2">
+                            <span class="font-bold text-secondary">Django & Python</span>
+                            <span class="text-accent">95%</span>
+                        </div>
+                        <div class="w-full bg-gray-300 rounded-full h-2">
+                            <div class="bg-tertiary h-2 rounded-full" style="width: 95%"></div>
+                        </div>
+                    </div>
+
+                    <!-- Skill 2 -->
+                    <div class="mb-6">
+                        <div class="flex justify-between mb-2">
+                            <span class="font-bold text-secondary">JavaScript & React</span>
+                            <span class="text-accent">85%</span>
+                        </div>
+                        <div class="w-full bg-gray-300 rounded-full h-2">
+                            <div class="bg-tertiary h-2 rounded-full" style="width: 85%"></div>
+                        </div>
+                    </div>
+
+                    <!-- Skill 3 -->
+                    <div class="mb-6">
+                        <div class="flex justify-between mb-2">
+                            <span class="font-bold text-secondary">Tailwind CSS</span>
+                            <span class="text-accent">90%</span>
+                        </div>
+                        <div class="w-full bg-gray-300 rounded-full h-2">
+                            <div class="bg-tertiary h-2 rounded-full" style="width: 90%"></div>
+                        </div>
+                    </div>
+
+                    <!-- Skill 4 -->
+                    <div class="mb-6">
+                        <div class="flex justify-between mb-2">
+                            <span class="font-bold text-secondary">UI/UX Design</span>
+                            <span class="text-accent">80%</span>
+                        </div>
+                        <div class="w-full bg-gray-300 rounded-full h-2">
+                            <div class="bg-tertiary h-2 rounded-full" style="width: 80%"></div>
+                        </div>
+                    </div>
+
+                    <!-- Skill 5 -->
+                    <div>
+                        <div class="flex justify-between mb-2">
+                            <span class="font-bold text-secondary">Database Design</span>
+                            <span class="text-accent">88%</span>
+                        </div>
+                        <div class="w-full bg-gray-300 rounded-full h-2">
+                            <div class="bg-tertiary h-2 rounded-full" style="width: 88%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Experience Section -->
+    <section id="experience" class="py-12 sm:py-20 lg:py-32" style="background-color: var(--navy-dark);">
+        <div class="container mx-auto px-4 sm:px-6">
+            <h2 class="text-4xl sm:text-5xl font-bold text-white mb-12 text-center">Work Experience</h2>
+            
+            <div class="space-y-8">
+                <!-- Experience 1 -->
+                <div class="group p-6 rounded-lg border-l-4 smooth-transition hover-lift" style="border-color: var(--gold); background-color: var(--navy);">
+                    <div class="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-2 sm:gap-4 mb-3">
+                        <div>
+                            <h3 class="text-xl sm:text-2xl font-bold text-white">Senior Web Developer</h3>
+                            <p style="color: var(--gold);" class="font-semibold">Tech Company Inc.</p>
+                        </div>
+                        <span style="background-color: var(--gold);" class="text-primary px-4 py-1 rounded-full whitespace-nowrap font-bold text-sm">2022 - Present</span>
+                    </div>
+                    <p class="text-gray-300 mb-3">
+                        Led development of multiple full-stack web applications using Django and React. 
+                        Managed a team of 3 developers and improved application performance by 40%.
+                    </p>
+                    <div class="flex flex-wrap gap-2 mt-4">
+                        <span class="px-3 py-1 rounded-full text-sm" style="background-color: var(--blue); color: white;">Django</span>
+                        <span class="px-3 py-1 rounded-full text-sm" style="background-color: var(--blue); color: white;">React</span>
+                        <span class="px-3 py-1 rounded-full text-sm" style="background-color: var(--blue); color: white;">PostgreSQL</span>
+                    </div>
+                </div>
+
+                <!-- Experience 2 -->
+                <div class="group p-6 rounded-lg border-l-4 smooth-transition hover-lift" style="border-color: var(--gold); background-color: var(--navy);">
+                    <div class="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-2 sm:gap-4 mb-3">
+                        <div>
+                            <h3 class="text-xl sm:text-2xl font-bold text-white">Web Developer</h3>
+                            <p style="color: var(--gold);" class="font-semibold">Startup Solutions</p>
+                        </div>
+                        <span style="background-color: var(--gold);" class="text-primary px-4 py-1 rounded-full whitespace-nowrap font-bold text-sm">2020 - 2022</span>
+                    </div>
+                    <p class="text-gray-300 mb-3">
+                        Developed responsive web applications with focus on user experience. 
+                        Collaborated with design and product teams to deliver high-quality solutions.
+                    </p>
+                    <div class="flex flex-wrap gap-2 mt-4">
+                        <span class="px-3 py-1 rounded-full text-sm" style="background-color: var(--blue); color: white;">JavaScript</span>
+                        <span class="px-3 py-1 rounded-full text-sm" style="background-color: var(--blue); color: white;">Vue.js</span>
+                        <span class="px-3 py-1 rounded-full text-sm" style="background-color: var(--blue); color: white;">MongoDB</span>
+                    </div>
+                </div>
+
+                <!-- Experience 3 -->
+                <div class="group p-6 rounded-lg border-l-4 smooth-transition hover-lift" style="border-color: var(--gold); background-color: var(--navy);">
+                    <div class="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-2 sm:gap-4 mb-3">
+                        <div>
+                            <h3 class="text-xl sm:text-2xl font-bold text-white">Junior Developer</h3>
+                            <p style="color: var(--gold);" class="font-semibold">Digital Agency</p>
+                        </div>
+                        <span style="background-color: var(--gold);" class="text-primary px-4 py-1 rounded-full whitespace-nowrap font-bold text-sm">2019 - 2020</span>
+                    </div>
+                    <p class="text-gray-300 mb-3">
+                        Built static websites and assisted in full-stack development. 
+                        Learned best practices and modern development frameworks.
+                    </p>
+                    <div class="flex flex-wrap gap-2 mt-4">
+                        <span class="px-3 py-1 rounded-full text-sm" style="background-color: var(--blue); color: white;">HTML/CSS</span>
+                        <span class="px-3 py-1 rounded-full text-sm" style="background-color: var(--blue); color: white;">JavaScript</span>
+                        <span class="px-3 py-1 rounded-full text-sm" style="background-color: var(--blue); color: white;">jQuery</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+        <div class="container mx-auto px-4 sm:px-6">
+            <h2 class="text-4xl sm:text-5xl font-bold text-primary mb-12 text-center">Featured Projects</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
+                <!-- Project 1 -->
+                <div class="group overflow-hidden rounded-lg shadow-lg hover-lift bg-white">
+                    <div class="relative h-48 sm:h-56 overflow-hidden" style="background: linear-gradient(135deg, var(--blue), var(--gold));">
+                        <div class="absolute inset-0 flex items-center justify-center text-white">
+                            <span class="text-4xl">🚀</span>
+                        </div>
+                        <div class="absolute inset-0 bg-black opacity-0 group-hover:opacity-40 smooth-transition flex items-center justify-center">
+                            <span class="text-white font-bold opacity-0 group-hover:opacity-100">View More</span>
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-xl font-bold text-primary mb-2">E-Commerce Platform</h3>
+                        <p class="text-gray-600 text-sm mb-4">
+                            A full-featured online store with Django backend and React frontend.
+                        </p>
+                        <div class="flex flex-wrap gap-2 mb-4">
+                            <span style="background-color: var(--light); color: var(--primary);" class="px-2 py-1 rounded text-xs font-bold">Django</span>
+                            <span style="background-color: var(--light); color: var(--primary);" class="px-2 py-1 rounded text-xs font-bold">React</span>
+                            <span style="background-color: var(--light); color: var(--primary);" class="px-2 py-1 rounded text-xs font-bold">Stripe</span>
+                        </div>
+                        <a href="#" style="color: var(--blue);" class="font-bold hover:text-accent smooth-transition">View Project →</a>
+                    </div>
+                </div>
+
+                <!-- Project 2 -->
+                <div class="group overflow-hidden rounded-lg shadow-lg hover-lift bg-white">
+                    <div class="relative h-48 sm:h-56 overflow-hidden" style="background: linear-gradient(135deg, var(--navy), var(--blue));">
+                        <div class="absolute inset-0 flex items-center justify-center text-white">
+                            <span class="text-4xl">🎨</span>
+                        </div>
+                        <div class="absolute inset-0 bg-black opacity-0 group-hover:opacity-40 smooth-transition flex items-center justify-center">
+                            <span class="text-white font-bold opacity-0 group-hover:opacity-100">View More</span>
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-xl font-bold text-primary mb-2">Design System</h3>
+                        <p class="text-gray-600 text-sm mb-4">
+                            Comprehensive UI component library with documentation and examples.
+                        </p>
+                        <div class="flex flex-wrap gap-2 mb-4">
+                            <span style="background-color: var(--light); color: var(--primary);" class="px-2 py-1 rounded text-xs font-bold">Tailwind</span>
+                            <span style="background-color: var(--light); color: var(--primary);" class="px-2 py-1 rounded text-xs font-bold">Storybook</span>
+                            <span style="background-color: var(--light); color: var(--primary);" class="px-2 py-1 rounded text-xs font-bold">React</span>
+                        </div>
+                        <a href="#" style="color: var(--blue);" class="font-bold hover:text-accent smooth-transition">View Project →</a>
+                    </div>
+                </div>
+
+                <!-- Project 3 -->
+                <div class="group overflow-hidden rounded-lg shadow-lg hover-lift bg-white">
+                    <div class="relative h-48 sm:h-56 overflow-hidden" style="background: linear-gradient(135deg, var(--gold), var(--beige));">
+                        <div class="absolute inset-0 flex items-center justify-center text-white">
+                            <span class="text-4xl">📊</span>
+                        </div>
+                        <div class="absolute inset-0 bg-black opacity-0 group-hover:opacity-40 smooth-transition flex items-center justify-center">
+                            <span class="text-white font-bold opacity-0 group-hover:opacity-100">View More</span>
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-xl font-bold text-primary mb-2">Analytics Dashboard</h3>
+                        <p class="text-gray-600 text-sm mb-4">
+                            Real-time data visualization dashboard with interactive charts.
+                        </p>
+                        <div class="flex flex-wrap gap-2 mb-4">
+                            <span style="background-color: var(--light); color: var(--primary);" class="px-2 py-1 rounded text-xs font-bold">Django</span>
+                            <span style="background-color: var(--light); color: var(--primary);" class="px-2 py-1 rounded text-xs font-bold">Chart.js</span>
+                            <span style="background-color: var(--light); color: var(--primary);" class="px-2 py-1 rounded text-xs font-bold">PostgreSQL</span>
+                        </div>
+                        <a href="#" style="color: var(--blue);" class="font-bold hover:text-accent smooth-transition">View Project →</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- View All Projects Button -->
+            <div class="text-center mt-12">
+                <button style="background-color: var(--navy); color: white;" class="px-8 py-3 rounded-lg font-bold hover-lift smooth-transition">
+                    View All Projects
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Skills Section -->
+    <section id="skills" class="py-12 sm:py-20 lg:py-32 bg-white">
+        <div class="container mx-auto px-4 sm:px-6">
+            <h2 class="text-4xl sm:text-5xl font-bold text-primary mb-12 text-center">Technical Skills</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <!-- Skill Category 1 -->
+                <div class="p-6 rounded-lg hover-lift smooth-transition" style="background-color: var(--light); border-t-4;" style="border-color: var(--blue);">
+                    <h3 class="text-xl font-bold text-primary mb-4">Backend</h3>
+                    <ul class="space-y-2 text-gray-700">
+                        <li class="flex items-center"><span style="color: var(--gold);" class="mr-2">→</span>Django</li>
+                        <li class="flex items-center"><span style="color: var(--gold);" class="mr-2">→</span>Python</li>
+                        <li class="flex items-center"><span style="color: var(--gold);" class="mr-2">→</span>REST APIs</li>
+                        <li class="flex items-center"><span style="color: var(--gold);" class="mr-2">→</span>PostgreSQL</li>
+                    </ul>
+                </div>
+
+                <!-- Skill Category 2 -->
+                <div class="p-6 rounded-lg hover-lift smooth-transition" style="background-color: var(--light); border-t-4;" style="border-color: var(--blue);">
+                    <h3 class="text-xl font-bold text-primary mb-4">Frontend</h3>
+                    <ul class="space-y-2 text-gray-700">
+                        <li class="flex items-center"><span style="color: var(--gold);" class="mr-2">→</span>React</li>
+                        <li class="flex items-center"><span style="color: var(--gold);" class="mr-2">→</span>JavaScript</li>
+                        <li class="flex items-center"><span style="color: var(--gold);" class="mr-2">→</span>Tailwind CSS</li>
+                        <li class="flex items-center"><span style="color: var(--gold);" class="mr-2">→</span>HTML/CSS</li>
+                    </ul>
+                </div>
+
+                <!-- Skill Category 3 -->
+                <div class="p-6 rounded-lg hover-lift smooth-transition" style="background-color: var(--light); border-t-4;" style="border-color: var(--blue);">
+                    <h3 class="text-xl font-bold text-primary mb-4">Tools & DevOps</h3>
+                    <ul class="space-y-2 text-gray-700">
+                        <li class="flex items-center"><span style="color: var(--gold);" class="mr-2">→</span>Git</li>
+                        <li class="flex items-center"><span style="color: var(--gold);" class="mr-2">→</span>Docker</li>
+                        <li class="flex items-center"><span style="color: var(--gold);" class="mr-2">→</span>GitHub CI/CD</li>
+                        <li class="flex items-center"><span style="color: var(--gold);" class="mr-2">→</span>Linux</li>
+                    </ul>
+                </div>
+
+                <!-- Skill Category 4 -->
+                <div class="p-6 rounded-lg hover-lift smooth-transition" style="background-color: var(--light); border-t-4;" style="border-color: var(--blue);">
+                    <h3 class="text-xl font-bold text-primary mb-4">Design & Other</h3>
+                    <ul class="space-y-2 text-gray-700">
+                        <li class="flex items-center"><span style="color: var(--gold);" class="mr-2">→</span>UI/UX Design</li>
+                        <li class="flex items-center"><span style="color: var(--gold);" class="mr-2">→</span>Figma</li>
+                        <li class="flex items-center"><span style="color: var(--gold);" class="mr-2">→</span>Agile</li>
+                        <li class="flex items-center"><span style="color: var(--gold);" class="mr-2">→</span>Problem Solving</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+        <div class="container mx-auto px-4 sm:px-6">
+            <h2 class="text-4xl sm:text-5xl font-bold text-primary mb-12 text-center">Get In Touch</h2>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
+                <!-- Contact Information -->
+                <div class="space-y-8">
+                    <div class="flex gap-6 group">
+                        <div class="flex-shrink-0">
+                            <div class="flex items-center justify-center h-12 w-12 rounded-lg" style="background-color: var(--blue); color: white;">
+                                📧
+                            </div>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-bold text-primary mb-2">Email</h3>
+                            <a href="mailto:sabrina@example.com" style="color: var(--blue);" class="hover:text-accent smooth-transition">
+                                sabrina@example.com
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="flex gap-6 group">
+                        <div class="flex-shrink-0">
+                            <div class="flex items-center justify-center h-12 w-12 rounded-lg" style="background-color: var(--blue); color: white;">
+                                📱
+                            </div>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-bold text-primary mb-2">Phone</h3>
+                            <a href="tel:+6281234567890" style="color: var(--blue);" class="hover:text-accent smooth-transition">
+                                +62 812 3456 7890
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="flex gap-6 group">
+                        <div class="flex-shrink-0">
+                            <div class="flex items-center justify-center h-12 w-12 rounded-lg" style="background-color: var(--blue); color: white;">
+                                📍
+                            </div>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-bold text-primary mb-2">Location</h3>
+                            <p class="text-gray-600">
+                                Jakarta, Indonesia
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Social Links -->
+                    <div>
+                        <h3 class="text-lg font-bold text-primary mb-4">Follow Me</h3>
+                        <div class="flex gap-4">
+                            <a href="#" class="w-12 h-12 rounded-lg flex items-center justify-center smooth-transition hover-lift" style="background-color: var(--light); color: var(--blue);">
+                                𝕏
+                            </a>
+                            <a href="#" class="w-12 h-12 rounded-lg flex items-center justify-center smooth-transition hover-lift" style="background-color: var(--light); color: var(--blue);">
+                                in
+                            </a>
+                            <a href="#" class="w-12 h-12 rounded-lg flex items-center justify-center smooth-transition hover-lift" style="background-color: var(--light); color: var(--blue);">
+                                🐙
+                            </a>
+                            <a href="#" class="w-12 h-12 rounded-lg flex items-center justify-center smooth-transition hover-lift" style="background-color: var(--light); color: var(--blue);">
+                                f
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Contact Form -->
+                <div style="background-color: var(--light);" class="rounded-lg p-8 hover-lift">
+                    <form id="contactForm" class="space-y-6">
+                        <div>
+                            <label class="block text-primary font-bold mb-2">Full Name</label>
+                            <input type="text" required class="w-full px-4 py-3 border-2 rounded-lg focus:outline-none smooth-transition" style="border-color: var(--blue);" placeholder="Your Name" onchange="this.parentElement.classList.add('has-value')">
+                        </div>
+
+                        <div>
+                            <label class="block text-primary font-bold mb-2">Email Address</label>
+                            <input type="email" required class="w-full px-4 py-3 border-2 rounded-lg focus:outline-none smooth-transition" style="border-color: var(--blue);" placeholder="your@email.com" onchange="this.parentElement.classList.add('has-value')">
+                        </div>
+
+                        <div>
+                            <label class="block text-primary font-bold mb-2">Subject</label>
+                            <input type="text" required class="w-full px-4 py-3 border-2 rounded-lg focus:outline-none smooth-transition" style="border-color: var(--blue);" placeholder="Message Subject" onchange="this.parentElement.classList.add('has-value')">
+                        </div>
+
+                        <div>
+                            <label class="block text-primary font-bold mb-2">Message</label>
+                            <textarea required class="w-full px-4 py-3 border-2 rounded-lg focus:outline-none smooth-transition" style="border-color: var(--blue);" rows="5" placeholder="Your message..."></textarea>
+                        </div>
+
+                        <button type="submit" class="w-full px-6 py-3 rounded-lg font-bold text-white smooth-transition hover-lift" style="background-color: var(--navy); color: white;">
+                            Send Message
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    {% include 'main_project/footer.html' %}
+</body>
+</html>
