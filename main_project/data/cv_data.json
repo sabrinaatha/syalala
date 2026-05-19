@@ -1,0 +1,101 @@
+{
+  "profile": {
+    "name": "Sabrina",
+    "tagline": "Analyst, Developer, and Data Person",
+    "bio": "Not just one thing. I analyze, I code, I dig into data, and sometimes all three at once. This is a collection of projects that came out of that chaos.",
+    "location": "Jakarta, Indonesia",
+    "email": "sabrinaaathashania@gmail.com",
+    "phone": "+62 82213913082",
+    "photo": "main_project/images/image_pp.png",
+    "social": {
+      "twitter": "#",
+      "linkedin": "#",
+      "github": "#",
+      "facebook": "#"
+    }
+  },
+  "stats": [
+    { "value": "15+", "label": "Projects Completed" },
+    { "value": "50+", "label": "Happy Clients" },
+    { "value": "3+",  "label": "Years Experience" },
+    { "value": "8+",  "label": "Tech Skills" }
+  ],
+  "skills_bar": [
+    { "name": "Django & Python",    "pct": 95 },
+    { "name": "JavaScript & React", "pct": 85 },
+    { "name": "Tailwind CSS",       "pct": 90 },
+    { "name": "UI/UX Design",       "pct": 80 },
+    { "name": "Database Design",    "pct": 88 }
+  ],
+  "skills_grid": [
+    {
+      "category": "Backend",
+      "icon": "server",
+      "items": ["Django", "Python", "REST APIs", "PostgreSQL"]
+    },
+    {
+      "category": "Frontend",
+      "icon": "layout",
+      "items": ["React", "JavaScript", "Tailwind CSS", "HTML/CSS"]
+    },
+    {
+      "category": "Tools & DevOps",
+      "icon": "tool",
+      "items": ["Git", "Docker", "GitHub CI/CD", "Linux"]
+    },
+    {
+      "category": "Design & Other",
+      "icon": "palette",
+      "items": ["UI/UX Design", "Figma", "Agile", "Problem Solving"]
+    }
+  ],
+  "experience": [
+    {
+      "title": "Senior Web Developer",
+      "company": "Tech Company Inc.",
+      "period": "2022 - Present",
+      "description": "Led development of multiple full-stack web applications using Django and React. Managed a team of 3 developers and improved application performance by 40%.",
+      "tags": ["Django", "React", "PostgreSQL"]
+    },
+    {
+      "title": "Web Developer",
+      "company": "Startup Solutions",
+      "period": "2020 - 2022",
+      "description": "Developed responsive web applications with focus on user experience. Collaborated with design and product teams to deliver high-quality solutions.",
+      "tags": ["JavaScript", "Vue.js", "MongoDB"]
+    },
+    {
+      "title": "Junior Developer",
+      "company": "Digital Agency",
+      "period": "2019 - 2020",
+      "description": "Built static websites and assisted in full-stack development. Learned best practices and modern development frameworks.",
+      "tags": ["HTML/CSS", "JavaScript", "jQuery"]
+    }
+  ],
+  "projects": [
+    {
+      "title": "E-Commerce Platform",
+      "description": "A full-featured online store with Django backend and React frontend.",
+      "emoji": "🚀",
+      "gradient": "135deg, #2E6DA4, #D4A017",
+      "tags": ["Django", "React", "Stripe"],
+      "url": "#"
+    },
+    {
+      "title": "Design System",
+      "description": "Comprehensive UI component library with documentation and examples.",
+      "emoji": "🎨",
+      "gradient": "135deg, #1A3A5C, #2E6DA4",
+      "tags": ["Tailwind", "Storybook", "React"],
+      "url": "#"
+    },
+    {
+      "title": "Analytics Dashboard",
+      "description": "Real-time data visualization dashboard with interactive charts.",
+      "emoji": "📊",
+      "gradient": "135deg, #D4A017, #F5E6C0",
+      "tags": ["Django", "Chart.js", "PostgreSQL"],
+      "url": "#"
+    }
+  ]
+}
