@@ -1,0 +1,163 @@
+<style>
+/* NAVBAR styles extracted from main_project/home.html so navbar looks consistent
+   across pages when included via template. Uses root color variables where available. */
+/* NAVBAR — desktop pill */
+#topnav {
+    position: fixed;
+    top: 1rem;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 100;
+    background: rgba(13,33,55,.88);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border: 1px solid rgba(255,255,255,.1);
+    border-radius: 999px;
+    padding: .4rem .75rem;
+    display: flex;
+    gap: .25rem;
+    align-items: center;
+    transition: box-shadow .3s;
+    max-width: calc(100vw - 2rem);
+}
+#topnav:hover { box-shadow: 0 8px 32px rgba(0,0,0,.28); }
+
+.nav-pill {
+    position: relative;
+    color: rgba(255,255,255,.7);
+    font-size: .8rem;
+    font-weight: 500;
+    letter-spacing: .03em;
+    padding: .35rem .7rem;
+    border-radius: 999px;
+    transition: color .2s, background .2s;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+.nav-pill:hover { color: #fff; background: rgba(255,255,255,.08); }
+.nav-pill.active { color: #fff; background: var(--gold); }
+.nav-pill.active:hover { background: var(--gold-dim); }
+
+/* Dropdown */
+.nav-item { position: relative; }
+.dropdown {
+    position: absolute;
+    top: calc(100% + 10px);
+    left: 50%;
+    transform: translateX(-50%) translateY(-6px);
+    background: rgba(13, 33, 55, 0.97);
+    backdrop-filter: blur(14px);
+    border: 1px solid rgba(255,255,255,.12);
+    border-radius: 12px;
+    padding: .5rem .4rem;
+    min-width: 160px;
+    display: flex;
+    flex-direction: column;
+    gap: .15rem;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .2s ease, transform .2s ease;
+    z-index: 200;
+}
+.dropdown::before {
+    content: '';
+    position: absolute;
+    top: -6px;
+    left: 50%;
+    transform: translateX(-50%);
+    border-left: 6px solid transparent;
+    border-right: 6px solid transparent;
+    border-bottom: 6px solid rgba(255,255,255,.12);
+}
+.nav-item:hover .dropdown {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateX(-50%) translateY(0);
+}
+.dropdown-link {
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+    color: rgba(255,255,255,.75);
+    font-size: .82rem;
+    font-weight: 500;
+    padding: .5rem .85rem;
+    border-radius: 8px;
+    text-decoration: none;
+    transition: background .15s, color .15s;
+    white-space: nowrap;
+}
+.dropdown-link:hover { background: rgba(212,160,23,.15); color: var(--gold); }
+
+/* MOBILE NAVBAR */
+#mobile-nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    display: none;
+    align-items: center;
+    justify-content: space-between;
+    padding: .9rem 1.25rem;
+    background: rgba(13,33,55,.95);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border-bottom: 1px solid rgba(255,255,255,.08);
+}
+.mobile-logo { font-family: 'Roboto', sans-serif; font-weight: 800; font-size: 1.1rem; color: var(--gold); letter-spacing: -.01em; }
+#hamburger { width: 36px; height: 36px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px; cursor: pointer; background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.12); border-radius: 8px; padding: 0; }
+#hamburger span { display: block; width: 18px; height: 1.5px; background: #fff; border-radius: 2px; transition: transform .25s, opacity .25s; }
+#hamburger.open span:nth-child(1) { transform: translateY(6.5px) rotate(45deg); }
+#hamburger.open span:nth-child(2) { opacity: 0; }
+#hamburger.open span:nth-child(3) { transform: translateY(-6.5px) rotate(-45deg); }
+
+#mobile-drawer { position: fixed; top: 57px; left: 0; right: 0; bottom: 0; z-index: 99; background: rgba(13,33,55,.97); backdrop-filter: blur(20px); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: .25rem; opacity: 0; pointer-events: none; transition: opacity .25s ease; }
+#mobile-drawer.open { opacity: 1; pointer-events: auto; }
+.mobile-link { font-family: 'Roboto', sans-serif; font-weight: 700; font-size: 1.6rem; color: rgba(255,255,255,.7); text-decoration: none; padding: .5rem 2rem; border-radius: 12px; transition: color .2s, background .2s; letter-spacing: -.01em; }
+.mobile-link:hover, .mobile-link.active { color: var(--gold); }
+
+@media (max-width: 767px) { #topnav { display: none !important; } #mobile-nav { display: flex; } }
+@media (min-width: 768px) { #mobile-nav { display: none !important; } #mobile-drawer { display: none !important; } }
+</style>
+
+<nav id="mobile-nav" aria-label="Mobile navigation">
+    <span class="mobile-logo">{% if cv.profile.name %}{{ cv.profile.name|truncatechars:14 }}{% else %}Portfolio{% endif %}</span>
+    <button id="hamburger" aria-label="Toggle menu" aria-expanded="false">
+        <span></span><span></span><span></span>
+    </button>
+</nav>
+
+<div id="mobile-drawer" role="dialog" aria-modal="true" aria-label="Navigation menu">
+    <a href="{% url 'home' %}#home" class="mobile-link {% if active_page == 'home' %}active{% endif %}" data-section="home">Home</a>
+    <a href="{% url 'home' %}#about" class="mobile-link" data-section="about">About</a>
+    <a href="{% url 'works' %}" class="mobile-link {% if active_page == 'works' %}active{% endif %}" data-section="experience">Work</a>
+    <a href="{% url 'projects' %}" class="mobile-link {% if active_page == 'projects' %}active{% endif %}" data-section="projects">Projects</a>
+    <a href="{% url 'skills' %}" class="mobile-link {% if active_page == 'skills' %}active{% endif %}" data-section="skills">Skills</a>
+    <a href="{% url 'home' %}#contact" class="mobile-link" data-section="contact">Contact</a>
+</div>
+
+<nav id="topnav" aria-label="Main navigation">
+    <div class="nav-item">
+        <a href="{% url 'home' %}#home" class="nav-pill {% if active_page == 'home' %}active{% endif %}" data-section="home">
+            Home
+        </a>
+    </div>
+    <div class="nav-item">
+        <a href="{% url 'home' %}#about" class="nav-pill" data-section="about">About</a>
+    </div>
+    <div class="nav-item">
+        <a href="{% url 'works' %}" class="nav-pill {% if active_page == 'works' %}active{% endif %}" data-section="experience">Work</a>
+    </div>
+    <div class="nav-item">
+        <a href="{% url 'projects' %}" class="nav-pill {% if active_page == 'projects' %}active{% endif %}" data-section="projects">
+            Projects
+        </a>
+    </div>
+    <div class="nav-item">
+        <a href="{% url 'skills' %}" class="nav-pill {% if active_page == 'skills' %}active{% endif %}" data-section="skills">Skills</a>
+    </div>
+    <div class="nav-item">
+        <a href="{% url 'home' %}#contact" class="nav-pill" data-section="contact">Contact</a>
+    </div>
+</nav>

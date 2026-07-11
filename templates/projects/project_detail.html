@@ -1,0 +1,875 @@
+<!DOCTYPE html>
+<html lang="en">
+{% load static %}
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ project.title }} — {{ cv.profile.name }}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg:         #0D2137;
+            --bg2:        #1A3A5C;
+            --bg3:        #2E6DA4;
+            --surface:    #1A3A5C;
+            --border:     rgba(212,160,23,.15);
+            --border2:    rgba(212,160,23,.25);
+            --gold:       #D4A017;
+            --gold-light: #F5E6C0;
+            --gold-glow:  rgba(212,160,23,.1);
+            --text:       #F5E6C0;
+            --text-muted: #B6D0F0;
+            --text-dim:   #8FA7C3;
+            --white:      #FFFFFF;
+        }
+
+        *, *::before, *::after { box-sizing: border-box; margin:0; padding:0; }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+        h1,h2,h3,h4 { font-family: 'Roboto', sans-serif; }
+
+        /* ── Noise overlay ── */
+        body::before {
+            content:''; position:fixed; inset:0; z-index:0; pointer-events:none;
+            background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+            background-size:200px 200px; opacity:.4;
+        }
+
+        /* ── Reveal ── */
+        .reveal       { opacity:0; transform:translateY(24px);  transition:opacity .6s cubic-bezier(.16,1,.3,1), transform .6s cubic-bezier(.16,1,.3,1); }
+        .reveal.visible { opacity:1; transform:none; }
+        .reveal-left  { opacity:0; transform:translateX(-24px); transition:opacity .6s cubic-bezier(.16,1,.3,1), transform .6s cubic-bezier(.16,1,.3,1); }
+        .reveal-left.visible  { opacity:1; transform:none; }
+        .reveal-right { opacity:0; transform:translateX(24px);  transition:opacity .6s cubic-bezier(.16,1,.3,1), transform .6s cubic-bezier(.16,1,.3,1); }
+        .reveal-right.visible { opacity:1; transform:none; }
+
+        /* ══════════════ MOBILE NAV ══════════════ */
+        #mobile-nav {
+            position:fixed; top:0; left:0; right:0; z-index:200;
+            display:none; align-items:center; justify-content:space-between;
+            padding:.85rem 1.25rem;
+            background:rgba(13,33,55,.96); backdrop-filter:blur(16px);
+            border-bottom:1px solid rgba(46,109,164,.18);
+        }
+        .mobile-logo {
+            font-family:'Roboto',sans-serif; font-weight:800; font-size:1rem;
+            background:linear-gradient(90deg, var(--gold), #f0c84a);
+            -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+        }
+        #hamburger {
+            width:36px; height:36px;
+            display:flex; flex-direction:column; align-items:center; justify-content:center; gap:5px;
+            cursor:pointer; background:rgba(212,160,23,.08);
+            border:1px solid var(--border); border-radius:8px; padding:0;
+        }
+        #hamburger span { display:block; width:18px; height:1.5px; background:var(--text); border-radius:2px; transition:transform .25s, opacity .25s; }
+        #hamburger.open span:nth-child(1) { transform:translateY(6.5px) rotate(45deg); }
+        #hamburger.open span:nth-child(2) { opacity:0; }
+        #hamburger.open span:nth-child(3) { transform:translateY(-6.5px) rotate(-45deg); }
+        #mobile-drawer {
+            position:fixed; top:57px; left:0; right:0; bottom:0; z-index:199;
+            background:rgba(13,33,55,.98); backdrop-filter:blur(24px);
+            display:flex; flex-direction:column; align-items:center; justify-content:center; gap:.5rem;
+            opacity:0; pointer-events:none; transition:opacity .25s;
+        }
+        #mobile-drawer.open { opacity:1; pointer-events:auto; }
+        .mobile-link {
+            font-family:'Roboto',sans-serif; font-weight:700; font-size:1.7rem;
+            color:rgba(232,224,208,.55); text-decoration:none;
+            padding:.5rem 2.5rem; border-radius:10px; transition:color .2s, background .2s;
+        }
+        .mobile-link:hover, .mobile-link.active { color:var(--gold); background:rgba(212,160,23,.07); }
+
+        /* ══════════════ DESKTOP PILL NAV ══════════════ */
+        #topnav {
+            position:fixed; top:1rem; left:50%; transform:translateX(-50%); z-index:200;
+            background:rgba(13,33,55,.88); backdrop-filter:blur(16px);
+            border:1px solid rgba(46,109,164,.18); border-radius:999px;
+            padding:.4rem .75rem; display:flex; gap:.2rem; align-items:center;
+            transition:box-shadow .3s, border-color .3s; max-width:calc(100vw - 2rem);
+        }
+        #topnav:hover { border-color:var(--border2); box-shadow:0 0 32px rgba(212,160,23,.08); }
+        .nav-pill {
+            color:var(--text-muted); font-size:.78rem; font-weight:500;
+            letter-spacing:.05em; padding:.35rem .75rem; border-radius:999px;
+            transition:color .2s, background .2s; text-transform:uppercase;
+            white-space:nowrap; text-decoration:none;
+        }
+        .nav-pill:hover { color:var(--text); background:rgba(255,255,255,.05); }
+        .nav-pill.active { color:#07111e; background:var(--gold); font-weight:700; }
+        .nav-item { position:relative; }
+        .dropdown {
+            position:absolute; top:calc(100% + 12px); left:50%;
+            transform:translateX(-50%) translateY(-6px);
+            background:rgba(13,33,55,.97); border:1px solid var(--border); border-radius:12px;
+            padding:.4rem; min-width:165px; display:flex; flex-direction:column; gap:.1rem;
+            opacity:0; pointer-events:none; transition:opacity .2s, transform .2s; z-index:300;
+            backdrop-filter:blur(16px);
+        }
+        .dropdown::before { content:''; position:absolute; top:-6px; left:50%; transform:translateX(-50%); border-left:6px solid transparent; border-right:6px solid transparent; border-bottom:6px solid var(--border); }
+        .nav-item:hover .dropdown { opacity:1; pointer-events:auto; transform:translateX(-50%) translateY(0); }
+        .dropdown-link { display:flex; align-items:center; gap:.5rem; color:var(--text-muted); font-size:.8rem; font-weight:500; padding:.5rem .9rem; border-radius:8px; text-decoration:none; transition:background .15s, color .15s; white-space:nowrap; }
+        .dropdown-link:hover { background:rgba(212,160,23,.1); color:var(--gold); }
+
+        @media (max-width:767px) { #topnav { display:none !important; } #mobile-nav { display:flex; } }
+        @media (min-width:768px) { #mobile-nav { display:none !important; } #mobile-drawer { display:none !important; } }
+
+        /* ══════════════ PROJECT HERO ══════════════ */
+        .proj-hero {
+            position:relative; overflow:hidden;
+            padding:8rem 0 5rem;
+            background: linear-gradient(160deg, #0D2137 0%, #1A3A5C 45%, #2E6DA4 100%);
+            min-height:52vh; display:flex; align-items:flex-end;
+        }
+        .proj-hero::after {
+            content:''; position:absolute; inset:0; pointer-events:none;
+            background-image:radial-gradient(circle, rgba(212,160,23,.15) 1px, transparent 1px);
+            background-size:32px 32px;
+            mask-image:radial-gradient(ellipse 70% 90% at 15% 50%, black 0%, transparent 70%);
+            -webkit-mask-image:radial-gradient(ellipse 70% 90% at 15% 50%, black 0%, transparent 70%);
+        }
+        .hero-glow {
+            position:absolute; left:-5%; top:-20%;
+            width:700px; height:700px; border-radius:50%;
+            background:radial-gradient(circle, rgba(212,160,23,.16) 0%, transparent 65%);
+            pointer-events:none;
+        }
+        .hero-emoji-mark {
+            position:absolute; right:3%; bottom:-4%;
+            font-size:clamp(8rem,18vw,20rem);
+            opacity:.05; line-height:1; pointer-events:none; user-select:none;
+            filter:grayscale(1);
+        }
+        .hero-cut {
+            position:absolute; bottom:-2px; left:0; right:0; height:70px;
+            background:var(--bg);
+            clip-path:polygon(0 0, 100% 55%, 100% 100%, 0 100%);
+        }
+
+        /* ── Section label ── */
+        .section-label {
+            display:inline-flex; align-items:center; gap:.5rem;
+            font-size:.72rem; font-weight:700; text-transform:uppercase;
+            letter-spacing:.16em; color:var(--gold); margin-bottom:.6rem;
+        }
+        .section-label::before { content:''; width:18px; height:1.5px; background:var(--gold); display:inline-block; }
+
+        /* ── Breadcrumb ── */
+        .breadcrumb { display:flex; align-items:center; gap:.45rem; flex-wrap:wrap; margin-bottom:2rem; }
+        .breadcrumb a {
+            font-family:'Roboto',sans-serif; font-weight:600; font-size:.78rem;
+            color:var(--text-dim); text-decoration:none; letter-spacing:.04em; text-transform:uppercase;
+            transition:color .2s;
+        }
+        .breadcrumb a:hover { color:var(--gold); }
+        .breadcrumb-sep { color:var(--text-dim); font-size:.75rem; }
+        .breadcrumb-current { font-family:'Roboto',sans-serif; font-size:.78rem; color:var(--text-muted); letter-spacing:.04em; text-transform:uppercase; }
+
+        /* ── Ability badge ── */
+        .ab-badge {
+            display:inline-flex; align-items:center; gap:.4rem;
+            font-family:'Roboto',sans-serif; font-weight:700;
+            font-size:.72rem; letter-spacing:.06em; text-transform:uppercase;
+            padding:.3rem .85rem; border-radius:999px; flex-shrink:0;
+        }
+        .ab-dot { width:7px; height:7px; border-radius:50%; flex-shrink:0; }
+        .ab-Beginner     { background:rgba(212,160,23,.15); color:var(--gold); border:1px solid rgba(212,160,23,.25); }
+        .ab-Intermediate { background:rgba(46,109,164,.15);  color:#5b9fd4; border:1px solid rgba(46,109,164,.25); }
+        .ab-Advanced     { background:rgba(22,163,74,.15);   color:#34c775; border:1px solid rgba(22,163,74,.25); }
+        .ab-Expert       { background:rgba(139,92,246,.15);  color:#a78bfa; border:1px solid rgba(139,92,246,.25); }
+
+        /* ── Tag pill (hero) ── */
+        .hero-tag {
+            font-size:.7rem; font-weight:600; letter-spacing:.04em;
+            padding:.25rem .7rem; border-radius:999px;
+            background:rgba(255,255,255,.06);
+            color:rgba(232,224,208,.8);
+            border:1px solid rgba(255,255,255,.1);
+        }
+
+        /* ══════════════ VIDEO SECTION ══════════════ */
+        .video-outer {
+            border-radius:16px; overflow:hidden;
+            border:1px solid var(--border);
+            box-shadow:0 0 60px rgba(212,160,23,.06), 0 24px 64px rgba(0,0,0,.5);
+            background:var(--bg2);
+            position:relative;
+        }
+
+        /* Play button hover */
+        #ytPlaceholder .play-ring {
+            transition: transform .2s, box-shadow .2s;
+        }
+        #ytPlaceholder:hover .play-ring {
+            transform: scale(1.1);
+            box-shadow: 0 0 0 18px rgba(212,160,23,.22), 0 0 0 36px rgba(212,160,23,.08) !important;
+        }
+
+        /* ── "Open in new tab" fallback ── */
+        .video-fallback {
+            aspect-ratio:16/9;
+            display:flex; flex-direction:column; align-items:center; justify-content:center; gap:1.25rem;
+            background:var(--bg3);
+        }
+
+        /* ══════════════ CONTENT BLOCKS ══════════════ */
+        .content-block {
+            background:var(--bg2);
+            border:1px solid var(--border);
+            border-radius:16px; padding:1.75rem 2rem;
+        }
+        .content-block h2 {
+            font-size:1.35rem; color:var(--text); margin-bottom:1.25rem;
+        }
+
+        /* prose */
+        .prose-dark { line-height:1.85; color:var(--text-muted); }
+        .prose-dark p { margin-bottom:1rem; }
+        .prose-dark h3 { font-family:'Roboto',sans-serif; font-weight:700; color:var(--text); margin:1.5rem 0 .5rem; font-size:1.05rem; }
+        .prose-dark ul { list-style:none; padding:0; margin-bottom:1rem; }
+        .prose-dark ul li { padding:.3rem 0; padding-left:1.2rem; position:relative; color:var(--text-muted); }
+        .prose-dark ul li::before { content:'→'; position:absolute; left:0; color:var(--gold); font-size:.8rem; top:.35rem; }
+
+        /* ══════════════ SKILL CARDS ══════════════ */
+        .skill-card {
+            background:var(--bg3);
+            border:1px solid var(--border);
+            border-radius:14px; padding:1.1rem 1.25rem;
+            transition:border-color .3s, transform .3s, box-shadow .3s;
+        }
+        .skill-card:hover {
+            border-color:var(--border2);
+            transform:translateY(-3px);
+            box-shadow:0 0 24px rgba(212,160,23,.07), 0 12px 32px rgba(0,0,0,.3);
+        }
+        .skill-bar-track { background:rgba(255,255,255,.06); border-radius:999px; height:5px; overflow:hidden; margin:.55rem 0; }
+        .skill-bar-fill  { height:100%; width:0; border-radius:999px; transition:width 1.2s cubic-bezier(.16,1,.3,1); }
+
+        /* tag pill (skills section) */
+        .tag-pill {
+            font-size:.68rem; font-weight:600; letter-spacing:.03em;
+            padding:.2rem .6rem; border-radius:999px;
+            background:rgba(46,109,164,.1); color:#5b9fd4;
+            border:1px solid rgba(46,109,164,.15); text-decoration:none;
+            transition:background .2s, color .2s;
+        }
+        .tag-pill:hover { background:rgba(212,160,23,.12); color:var(--gold); border-color:rgba(212,160,23,.2); }
+
+        /* ══════════════ SIDEBAR ══════════════ */
+        @media (min-width:1024px) {
+            .detail-sidebar { position:sticky; top:6.5rem; }
+        }
+
+        .meta-card {
+            background:var(--bg2);
+            border:1px solid var(--border);
+            border-radius:16px; padding:1.4rem;
+        }
+        .meta-card h3 { font-size:.95rem; color:var(--text); margin-bottom:1rem; }
+
+        .meta-row {
+            display:flex; align-items:flex-start; gap:.75rem;
+            padding:.65rem 0;
+            border-bottom:1px solid rgba(212,160,23,.08);
+        }
+        .meta-row:last-child { border-bottom:none; padding-bottom:0; }
+        .meta-icon {
+            width:34px; height:34px; border-radius:8px;
+            background:var(--bg3); border:1px solid var(--border);
+            display:flex; align-items:center; justify-content:center;
+            font-size:.95rem; flex-shrink:0;
+        }
+        .meta-label { font-size:.68rem; font-weight:700; text-transform:uppercase; letter-spacing:.1em; color:var(--text-dim); margin-bottom:.18rem; }
+        .meta-value { font-size:.88rem; font-weight:500; color:var(--text); }
+
+        /* ── Buttons ── */
+        .btn-gold {
+            background:var(--gold); color:#07111e;
+            font-family:'Roboto',sans-serif; font-weight:700; border-radius:10px;
+            padding:.75rem 1.5rem; transition:background .2s, transform .2s, box-shadow .2s;
+            display:inline-flex; align-items:center; justify-content:center; gap:.5rem;
+            text-decoration:none; border:none; cursor:pointer; font-size:.9rem;
+        }
+        .btn-gold:hover { background:var(--gold-dim); transform:translateY(-2px); box-shadow:0 8px 24px rgba(212,160,23,.3); }
+        .btn-outline {
+            border:1px solid var(--border2); color:var(--text-muted);
+            font-family:'Roboto',sans-serif; font-weight:700; border-radius:10px;
+            padding:.75rem 1.5rem; transition:all .2s;
+            display:inline-flex; align-items:center; justify-content:center; gap:.5rem;
+            text-decoration:none; background:transparent; font-size:.9rem;
+        }
+        .btn-outline:hover { border-color:var(--gold); color:var(--gold); background:var(--gold-glow); transform:translateY(-2px); }
+        .btn-ghost {
+            border:1px solid rgba(255,255,255,.07); color:var(--text-dim);
+            font-family:'Roboto',sans-serif; font-weight:600; border-radius:10px;
+            padding:.75rem 1.5rem; transition:all .2s;
+            display:inline-flex; align-items:center; justify-content:center; gap:.5rem;
+            text-decoration:none; background:transparent; font-size:.88rem;
+        }
+        .btn-ghost:hover { border-color:rgba(255,255,255,.15); color:var(--text-muted); }
+
+        /* ══════════════ RELATED PROJECTS ══════════════ */
+        .related-card {
+            background:var(--bg2); border:1px solid var(--border); border-radius:14px; overflow:hidden;
+            text-decoration:none; display:block;
+            transition:transform .3s, border-color .3s, box-shadow .3s;
+        }
+        .related-card:hover {
+            transform:translateY(-6px); border-color:var(--border2);
+            box-shadow:0 0 32px rgba(212,160,23,.08), 0 16px 40px rgba(0,0,0,.35);
+        }
+        .related-thumb { height:110px; display:flex; align-items:center; justify-content:center; font-size:2.5rem; position:relative; overflow:hidden; }
+        .related-thumb::after { content:''; position:absolute; inset:0; background:linear-gradient(to bottom, transparent 40%, rgba(13,33,55,.7) 100%); }
+
+        /* ── Gallery lightbox ── */
+        .gallery-img-wrap {
+            border-radius:12px; overflow:hidden;
+            border:1px solid var(--border); cursor:pointer;
+            transition:border-color .3s, transform .3s;
+        }
+        .gallery-img-wrap:hover { border-color:var(--border2); transform:scale(1.015); }
+        .gallery-img-wrap img { width:100%; height:200px; object-fit:cover; display:block; }
+
+        #lightbox {
+            display:none; position:fixed; inset:0; z-index:999;
+            background:rgba(0,0,0,.92);
+            align-items:center; justify-content:center;
+            flex-direction:column; gap:1rem; padding:1.5rem;
+        }
+
+        @media (max-width:767px) { .proj-hero { padding:6rem 0 4rem; min-height:auto; } }
+    </style>
+</head>
+<body>
+
+    {% include 'navbar.html' %}
+
+    <!-- ══════════════════════════════════
+         PROJECT HERO
+    ══════════════════════════════════ -->
+    <header class="proj-hero">
+        <div class="hero-glow"></div>
+
+        <div class="container mx-auto px-5 sm:px-6 relative w-full" style="z-index:1">
+
+            <!-- Breadcrumb -->
+            <nav class="breadcrumb" aria-label="Breadcrumb">
+                <a href="/">Home</a>
+                <span class="breadcrumb-sep">/</span>
+                <a href="/projects/">Projects</a>
+                <span class="breadcrumb-sep">/</span>
+                <span class="breadcrumb-current">{{ project.title|truncatechars:30 }}</span>
+            </nav>
+
+            <!-- Category label -->
+            <div class="section-label">{{ project.type }}</div>
+
+            <!-- Title -->
+            <h1 class="font-display font-extrabold mb-3 leading-tight"
+                style="font-size:clamp(2rem,5.5vw,3rem);
+                       max-width:820px;
+                       background:linear-gradient(135deg, #ffffff 40%, var(--gold) 100%);
+                       -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+                       background-clip:text;">
+                {{ project.title }}
+            </h1>
+
+            <!-- Date range -->
+            <p style="color:var(--text-muted);font-size:.95rem;margin-bottom:1.25rem">
+                {% if project.start_date %}
+                    {{ project.start_date|date:"M Y" }}{% if project.end_date %} – {{ project.end_date|date:"M Y" }}{% else %} – Present{% endif %}
+                {% endif %}
+            </p>
+        </div>
+        <div class="hero-cut"></div>
+    </header>
+
+    <!-- ══════════════════════════════════
+         MAIN CONTENT
+    ══════════════════════════════════ -->
+    <main class="container mx-auto px-5 sm:px-6 py-14" style="position:relative;z-index:1">
+        <div class="grid lg:grid-cols-3 gap-8">
+
+            <!-- ══ LEFT — MAIN COLUMN ══ -->
+            <div class="lg:col-span-2 flex flex-col gap-8">
+
+                <!-- ── LINK / VIDEO / EMBED SECTION ── -->
+                {% if project.link %}
+                <div class="reveal" id="linkSection">
+
+                    <!-- Container: JS akan isi ini dengan play-button ATAU langsung iframe -->
+                    <div class="video-outer" id="videoContainer"></div>
+
+                    <!-- Link shown below -->
+                    <div style="display:flex;align-items:center;gap:.6rem;margin-top:.85rem">
+                        <span style="font-size:.75rem;color:var(--text-dim);font-family:'Roboto',sans-serif;font-weight:600;text-transform:uppercase;letter-spacing:.08em">Source</span>
+                        <a href="{{ project.link }}" target="_blank" rel="noopener"
+                           style="font-size:.82rem;color:var(--gold);text-decoration:none;word-break:break-all;transition:opacity .2s"
+                           onmouseover="this.style.opacity='.7'" onmouseout="this.style.opacity='1'">
+                            {{ project.link }}
+                        </a>
+                    </div>
+                </div>
+
+                <script>
+                (function () {
+                    const raw = "{{ project.link|escapejs }}";
+                    const wrap = document.getElementById("videoContainer");
+                    if (!wrap) return;
+
+                    /* ── Deteksi tipe link ── */
+                    const ytMatch = raw.match(/(?:youtube\.com\/(?:watch\?(?:.*&)?v=|embed\/|shorts\/)|youtu\.be\/)([A-Za-z0-9_-]{11})/);
+                    const vimeoMatch = raw.match(/vimeo\.com\/(\d+)/);
+
+                    let mode    = "external"; // "video-yt" | "video-vimeo" | "embed" | "external"
+                    let embedSrc = null;
+                    let platform = "Link";
+                    let ytId     = null;
+
+                    if (ytMatch) {
+                        mode     = "video-yt";
+                        ytId     = ytMatch[1];
+                        platform = "YouTube";
+                        embedSrc = "https://www.youtube.com/embed/" + ytId + "?autoplay=1&rel=0&playsinline=1&modestbranding=1";
+
+                    } else if (vimeoMatch) {
+                        mode     = "video-vimeo";
+                        platform = "Vimeo";
+                        embedSrc = "https://player.vimeo.com/video/" + vimeoMatch[1] + "?autoplay=1&title=0&byline=0&portrait=0";
+
+                    } else if (raw.includes("docs.google.com/presentation") || raw.includes("canva.com/design")) {
+                        mode     = "embed";
+                        platform = raw.includes("canva") ? "Canva" : "Google Slides";
+                        embedSrc = raw.includes("canva")
+                            ? (raw.includes("?embed") ? raw : raw + (raw.includes("?") ? "&embed" : "?embed"))
+                            : raw.replace(/\/(edit|view|pub)(\?.*)?$/, "/embed");
+
+                    } else if (raw.includes("docs.google.com/document")) {
+                        mode     = "embed";
+                        platform = "Google Doc";
+                        embedSrc = raw.replace(/\/(edit|view)(\?.*)?$/, "/preview");
+
+                    } else if (raw.includes("drive.google.com")) {
+                        mode     = "embed";
+                        platform = "Google Drive";
+                        embedSrc = raw
+                            .replace(/\/view(\?.*)?$/, "/preview")
+                            .replace(/\/edit(\?.*)?$/, "/preview");
+
+                    } else if (/\.(pptx?|pdf)(\?.*)?$/i.test(raw) || raw.includes("view.officeapps.live.com")) {
+                        mode     = "embed";
+                        platform = /\.pdf/i.test(raw) ? "PDF" : "PowerPoint";
+                        embedSrc = raw.includes("view.officeapps.live.com")
+                            ? raw
+                            : "https://view.officeapps.live.com/op/embed.aspx?src=" + encodeURIComponent(raw);
+                    }
+
+                    /* ── Helper: buat iframe ── */
+                    function makeIframe(src, autoAspect) {
+                        const f = document.createElement("iframe");
+                        f.src = src;
+                        f.allow = "autoplay; fullscreen; picture-in-picture";
+                        f.allowFullscreen = true;
+                        f.style.cssText = "width:100%;" + (autoAspect ? "aspect-ratio:16/9;" : "min-height:520px;") + "border:none;display:block;border-radius:16px";
+                        return f;
+                    }
+
+                    /* ── Render berdasarkan mode ── */
+                    if (mode === "video-yt" || mode === "video-vimeo") {
+                        /* Video → tampilkan play-button overlay dulu */
+                        const thumb = mode === "video-yt"
+                            ? "https://img.youtube.com/vi/" + ytId + "/hqdefault.jpg"
+                            : null;
+
+                        wrap.innerHTML = `
+                            <div id="ytPlaceholder"
+                                 style="position:relative;width:100%;aspect-ratio:16/9;cursor:pointer;background:${thumb ? '#000' : 'var(--bg3)'};border-radius:16px;overflow:hidden"
+                                 onclick="window._playVideo()">
+                                ${thumb ? `<img src="${thumb}" alt="thumbnail" style="width:100%;height:100%;object-fit:cover;display:block;opacity:.75">` : ''}
+                                <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.25)">
+                                    <div class="play-ring" style="width:80px;height:80px;border-radius:999px;background:#D4A017;display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 12px rgba(212,160,23,.2),0 0 0 24px rgba(212,160,23,.08);transition:transform .2s,box-shadow .2s">
+                                        <div style="width:0;height:0;border-top:14px solid transparent;border-bottom:14px solid transparent;border-left:22px solid #07111e;margin-left:5px"></div>
+                                    </div>
+                                </div>
+                                <div style="position:absolute;bottom:.85rem;left:1rem;font-family:'Roboto',sans-serif;font-size:.68rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(232,224,208,.55);background:rgba(13,33,55,.6);padding:.25rem .65rem;border-radius:999px;border:1px solid rgba(255,255,255,.08);backdrop-filter:blur(6px)">
+                                    ${platform} · Klik untuk putar
+                                </div>
+                            </div>`;
+
+                        /* Hover ring */
+                        const ring = wrap.querySelector('.play-ring');
+                        const ph   = wrap.querySelector('#ytPlaceholder');
+                        if (ph && ring) {
+                            ph.addEventListener('mouseenter', () => {
+                                ring.style.transform = 'scale(1.1)';
+                                ring.style.boxShadow = '0 0 0 18px rgba(212,160,23,.22),0 0 0 36px rgba(212,160,23,.08)';
+                            });
+                            ph.addEventListener('mouseleave', () => {
+                                ring.style.transform = '';
+                                ring.style.boxShadow = '0 0 0 12px rgba(212,160,23,.2),0 0 0 24px rgba(212,160,23,.08)';
+                            });
+                        }
+
+                        window._playVideo = function () {
+                            wrap.innerHTML = '';
+                            wrap.appendChild(makeIframe(embedSrc, true));
+                        };
+
+                    } else if (mode === "embed") {
+                        /* Non-video embeddable → langsung tampilkan iframe, tanpa play button */
+                        /* Label platform di pojok kiri atas */
+                        const badge = document.createElement("div");
+                        badge.textContent = platform;
+                        badge.style.cssText = "position:absolute;top:.75rem;left:.75rem;font-family:'Roboto',sans-serif;font-size:.68rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(232,224,208,.55);background:rgba(13,33,55,.75);padding:.25rem .65rem;border-radius:999px;border:1px solid rgba(255,255,255,.08);backdrop-filter:blur(6px);z-index:2;pointer-events:none";
+                        wrap.style.position = "relative";
+                        wrap.appendChild(badge);
+                        wrap.appendChild(makeIframe(embedSrc, false));
+
+                    } else {
+                        /* Fallback: link biasa — tampilkan tombol buka */
+                        wrap.innerHTML = `
+                            <div style="aspect-ratio:16/9;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1rem;background:var(--bg3);border-radius:16px">
+                                <span style="font-size:2.5rem">🔗</span>
+                                <p style="color:var(--text-muted);font-size:.9rem">Pratinjau tidak tersedia</p>
+                                <a href="${raw}" target="_blank" rel="noopener"
+                                   style="background:var(--gold);color:#07111e;font-family:'Roboto',sans-serif;font-weight:700;border-radius:10px;padding:.6rem 1.4rem;text-decoration:none;font-size:.88rem">
+                                    Buka Link ↗
+                                </a>
+                            </div>`;
+                    }
+                })();
+                </script>
+                {% endif %}
+
+                <!-- ── DESCRIPTION ── -->
+                <div class="reveal" style="transition-delay:.05s">
+                    <div class="section-label">Overview</div>
+                    <div class="content-block">
+                        <h2>About This Project</h2>
+                        <div class="prose-dark">
+                            {% if project.description %}
+                                {{ project.description|linebreaks }}
+                            {% else %}
+                                <p style="color:var(--text-dim)">No description provided.</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ── SKILLS USED ── -->
+                {% if project.skills.all %}
+                <div class="reveal" style="transition-delay:.1s">
+                    <div class="section-label">Skills & Tools</div>
+                    <h2 class="font-display font-bold mb-5" style="font-size:1.3rem;color:var(--text)">Skills Used</h2>
+
+                    <div class="grid sm:grid-cols-2 gap-3">
+                        {% for skill in project.skills.all %}
+                        {# FIX: data-level pakai nilai bersih tanpa whitespace dari template tag #}
+                        <div class="skill-card reveal"
+                             style="transition-delay:{{ forloop.counter0 }}00ms"
+                             data-level="{{ skill.ability_level }}">
+
+                            <div style="display:flex;align-items:center;justify-content:space-between;gap:.5rem;margin-bottom:.4rem">
+                                <div style="display:flex;align-items:center;gap:.4rem;flex:1">
+                                    <span class="font-display font-bold" style="font-size:.9rem;color:var(--text)">{{ skill.skills_name }}</span>
+                                    {% if skill.type %}
+                                    <span style="font-size:.62rem;font-weight:600;letter-spacing:.04em;text-transform:uppercase;padding:.15rem .45rem;border-radius:999px;background:rgba(212,160,23,.12);color:var(--gold);border:1px solid rgba(212,160,23,.2);flex-shrink:0">
+                                        {{ skill.type }}
+                                    </span>
+                                    {% endif %}
+                                </div>
+                                <span class="ab-badge ab-{{ skill.ability_level }}" style="font-size:.62rem;padding:.18rem .55rem;flex-shrink:0">
+                                    <span class="ab-dot" style="background:
+                                        {% if skill.ability_level == 'Beginner' %}#D4A017
+                                        {% elif skill.ability_level == 'Intermediate' %}#2E6DA4
+                                        {% elif skill.ability_level == 'Advanced' %}#16a34a
+                                        {% else %}#8b5cf6{% endif %}">
+                                    </span>
+                                    {{ skill.ability_level }}
+                                </span>
+                            </div>
+
+                            <div class="skill-bar-track">
+                                <div class="skill-bar-fill"
+                                     style="background:linear-gradient(90deg,
+                                        {% if skill.ability_level == 'Beginner' %}#D4A017,#C4900F
+                                        {% elif skill.ability_level == 'Intermediate' %}#2E6DA4,#5b9fd4
+                                        {% elif skill.ability_level == 'Advanced' %}#16a34a,#2E6DA4
+                                        {% else %}#8b5cf6,#a78bfa{% endif %})">
+                                </div>
+                            </div>
+
+                            <div style="display:flex;justify-content:space-between;margin-top:.3rem">
+                                <span style="font-size:.68rem;color:var(--text-dim)">Proficiency</span>
+                                <span class="skill-pct-label" style="font-size:.68rem;color:var(--gold);font-weight:700"></span>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- ── GALLERY (optional) ── -->
+                {% if project.gallery.all %}
+                <div class="reveal" style="transition-delay:.15s">
+                    <div class="section-label">Gallery</div>
+                    <h2 class="font-display font-bold mb-4" style="font-size:1.3rem;color:var(--text)">Screenshots</h2>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        {% for img in project.gallery.all %}
+                        <div class="gallery-img-wrap" onclick="openLightbox('{{ img.url }}','{{ img.caption }}')">
+                            <img src="{{ img.url }}" alt="{{ img.caption }}">
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+
+            </div>
+
+            <!-- ══ RIGHT — SIDEBAR ══ -->
+            <aside class="detail-sidebar flex flex-col gap-5">
+
+                <!-- Project Info -->
+                <div class="meta-card reveal reveal-right">
+                    <h3 class="font-display font-bold">Project Info</h3>
+
+                    {% if project.type %}
+                    <div class="meta-row">
+                        <div class="meta-icon">🏷️</div>
+                        <div>
+                            <div class="meta-label">Type</div>
+                            <div class="meta-value">{{ project.type }}</div>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {% if project.start_date %}
+                    <div class="meta-row">
+                        <div class="meta-icon">📅</div>
+                        <div>
+                            <div class="meta-label">Period</div>
+                            <div class="meta-value">
+                                {{ project.start_date|date:"M Y" }}
+                                {% if project.end_date %} – {{ project.end_date|date:"M Y" }}
+                                {% else %} – Present{% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {% if project.skills.count %}
+                    <div class="meta-row">
+                        <div class="meta-icon">⚙️</div>
+                        <div>
+                            <div class="meta-label">Skills Used</div>
+                            <div class="meta-value">{{ project.skills.count }} skill{{ project.skills.count|pluralize }}</div>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {% with project.skills.first as fs %}
+                    {% if fs %}
+                    <div class="meta-row">
+                        <div class="meta-icon">⚡</div>
+                        <div>
+                            <div class="meta-label">Ability Level</div>
+                            <div class="meta-value" style="margin-top:.2rem">
+                                <span class="ab-badge ab-{{ fs.ability_level }}" style="font-size:.72rem">
+                                    <span class="ab-dot" style="background:
+                                        {% if fs.ability_level == 'Beginner' %}#D4A017
+                                        {% elif fs.ability_level == 'Intermediate' %}#2E6DA4
+                                        {% elif fs.ability_level == 'Advanced' %}#16a34a
+                                        {% else %}#8b5cf6{% endif %}">
+                                    </span>
+                                    {{ fs.ability_level }}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                    {% endwith %}
+
+                    {% if project.link %}
+                    <div class="meta-row">
+                        <div class="meta-icon">🔗</div>
+                        <div>
+                            <div class="meta-label">Link</div>
+                            <a href="{{ project.link }}" target="_blank" rel="noopener"
+                               style="font-size:.82rem;color:var(--gold);text-decoration:none;word-break:break-all;display:block;margin-top:.1rem;transition:opacity .2s"
+                               onmouseover="this.style.opacity='.7'" onmouseout="this.style.opacity='1'">
+                                {{ project.link|truncatechars:40 }}
+                            </a>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {% if project.image_url %}
+                    <div class="meta-row">
+                        <div class="meta-icon">🖼️</div>
+                        <div>
+                            <div class="meta-label">Preview Image</div>
+                            <a href="{{ project.image_url }}" target="_blank" rel="noopener"
+                               style="font-size:.8rem;color:var(--gold);text-decoration:none">
+                                View Image ↗
+                            </a>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <!-- Skills tags cloud -->
+                {% if project.skills.all %}
+                <div class="meta-card reveal reveal-right" style="transition-delay:.1s">
+                    <h3 class="font-display font-bold" style="margin-bottom:.85rem">Technologies</h3>
+                    <div style="display:flex;flex-wrap:wrap;gap:.4rem">
+                        {% for skill in project.skills.all %}
+                        <a href="/projects/?tag={{ skill.skills_name }}" class="tag-pill">{{ skill.skills_name }}{% if skill.type %}<span style="opacity:.6"> • {{ skill.type }}</span>{% endif %}</a>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+
+            </aside>
+        </div>
+    </main>
+
+    <!-- ══════════════════════════════════
+         RELATED PROJECTS
+    ══════════════════════════════════ -->
+    {% if related_projects %}
+    <section style="background:var(--bg2);border-top:1px solid var(--border)" class="py-16">
+        <div class="container mx-auto px-5 sm:px-6" style="position:relative;z-index:1">
+            <div class="section-label">More Work</div>
+            <h2 class="font-display font-extrabold mb-8"
+                style="font-size:clamp(1.6rem,3vw,2.2rem);
+                       background:linear-gradient(135deg,#fff 40%,var(--gold) 100%);
+                       -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">
+                Related Projects
+            </h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                {% for rp in related_projects %}
+                <a href="/projects/{{ rp.id }}/" class="related-card reveal" style="transition-delay:{{ forloop.counter0 }}00ms">
+                    <div class="related-thumb" style="background:linear-gradient(135deg,var(--bg3),var(--bg2))">
+                        <span style="position:relative;z-index:1;font-size:2.4rem">📁</span>
+                    </div>
+                    <div style="padding:1.1rem">
+                        <h3 class="font-display font-bold" style="font-size:.9rem;color:var(--text);margin-bottom:.3rem">{{ rp.title }}</h3>
+                        <p style="font-size:.78rem;color:var(--text-muted);line-height:1.45">{{ rp.description|truncatewords:12 }}</p>
+                        {% if rp.type %}
+                        <span style="display:inline-block;margin-top:.6rem;font-size:.65rem;color:var(--text-dim);font-family:'Roboto',sans-serif;font-weight:600;text-transform:uppercase;letter-spacing:.06em">{{ rp.type }}</span>
+                        {% endif %}
+                    </div>
+                </a>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+    {% endif %}
+
+    <!-- Lightbox -->
+    <div id="lightbox" onclick="closeLightbox()">
+        <img id="lightboxImg" src="" alt="" style="max-width:90vw;max-height:80vh;border-radius:12px;object-fit:contain;border:1px solid var(--border)">
+        <p id="lightboxCaption" style="color:var(--text-muted);font-size:.9rem;text-align:center"></p>
+        <button onclick="closeLightbox()" style="position:absolute;top:1.25rem;right:1.5rem;background:none;border:none;color:var(--text-muted);font-size:1.75rem;cursor:pointer;line-height:1;transition:color .2s" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='var(--text-muted)'">✕</button>
+    </div>
+
+    {% include 'footer.html' %}
+
+    <script>
+    /* ══════════════════════════════════
+       SKILL BAR — FIX UTAMA
+       - Baca level dari data-level (string bersih dari Django)
+       - Pakai lookup object, bukan nested if/else
+       - Observer per-bar, bukan per-main
+    ══════════════════════════════════ */
+    const LEVEL_CONFIG = {
+        'Beginner':     { pct: 30  },
+        'Intermediate': { pct: 60  },
+        'Advanced':     { pct: 82  },
+        'Expert':       { pct: 95  },
+    };
+
+    document.querySelectorAll('.skill-card').forEach(card => {
+        const level      = (card.dataset.level || '').trim();
+        const config     = LEVEL_CONFIG[level] || LEVEL_CONFIG['Intermediate'];
+        const bar        = card.querySelector('.skill-bar-fill');
+        const pctLabel   = card.querySelector('.skill-pct-label');
+
+        if (pctLabel) pctLabel.textContent = config.pct + '%';
+
+        if (!bar) return;
+
+        /* Observer per bar — trigger tepat saat bar masuk viewport */
+        const obs = new IntersectionObserver(entries => {
+            entries.forEach(e => {
+                if (e.isIntersecting) {
+                    /* Delay kecil agar CSS transition aktif setelah paint */
+                    requestAnimationFrame(() => {
+                        requestAnimationFrame(() => {
+                            bar.style.width = config.pct + '%';
+                        });
+                    });
+                    obs.unobserve(e.target);
+                }
+            });
+        }, { threshold: 0.1 });
+
+        obs.observe(bar);
+    });
+
+    /* ── Reveal ── */
+    const io = new IntersectionObserver(entries => {
+        entries.forEach(e => { if(e.isIntersecting){ e.target.classList.add('visible'); io.unobserve(e.target); } });
+    }, { threshold: 0.08 });
+    document.querySelectorAll('.reveal,.reveal-left,.reveal-right').forEach(el => io.observe(el));
+
+    /* ── Hamburger ── */
+    const hamburger = document.getElementById('hamburger');
+    const drawer    = document.getElementById('mobile-drawer');
+    if (hamburger && drawer) {
+        hamburger.addEventListener('click', () => {
+            const open = drawer.classList.toggle('open');
+            hamburger.classList.toggle('open', open);
+            hamburger.setAttribute('aria-expanded', String(open));
+            document.body.style.overflow = open ? 'hidden' : '';
+        });
+        drawer.querySelectorAll('.mobile-link').forEach(l => l.addEventListener('click', () => {
+            drawer.classList.remove('open');
+            hamburger.classList.remove('open');
+            hamburger.setAttribute('aria-expanded','false');
+            document.body.style.overflow = '';
+        }));
+    }
+
+    /* ── Lightbox ── */
+    function openLightbox(src, caption){
+        document.getElementById('lightboxImg').src = src;
+        document.getElementById('lightboxCaption').textContent = caption || '';
+        const lb = document.getElementById('lightbox');
+        lb.style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+    }
+    function closeLightbox(){
+        document.getElementById('lightbox').style.display = 'none';
+        document.body.style.overflow = '';
+    }
+    document.addEventListener('keydown', e => { if(e.key === 'Escape') closeLightbox(); });
+
+    /* ── Smooth scroll ── */
+    document.querySelectorAll('a[href^="#"]').forEach(a => {
+        a.addEventListener('click', e => {
+            const t = document.querySelector(a.getAttribute('href'));
+            if(t){ e.preventDefault(); t.scrollIntoView({behavior:'smooth'}); }
+        });
+    });
+    </script>
+</body>
+</html>

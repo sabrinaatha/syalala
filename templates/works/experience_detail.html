@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="en">
+{% load static %}
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ work.title }} — {{ cv.profile.name }}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg:        #0D2137;
+            --bg2:       #1A3A5C;
+            --bg3:       #2E6DA4;
+            --surface:   #1A3A5C;
+            --border:    rgba(212,160,23,.15);
+            --border2:   rgba(212,160,23,.25);
+            --gold:      #D4A017;
+            --gold-light:#F5E6C0;
+            --gold-glow: rgba(212,160,23,.1);
+            --navy:      #0D2137;
+            --text:      #F5E6C0;
+            --text-muted:#B6D0F0;
+            --text-dim:  #8FA7C3;
+            --white:     #FFFFFF;
+        }
+
+        *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+        html { scroll-behavior:smooth; }
+        body { font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--text); overflow-x:hidden; min-height:100vh; }
+        h1,h2,h3,h4 { font-family:'Roboto',sans-serif; }
+
+        body::before {
+            content:''; position:fixed; inset:0; z-index:0; pointer-events:none;
+            background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E");
+            background-size:200px 200px; opacity:.6;
+        }
+
+        .reveal { opacity:0; transform:translateY(20px); transition:opacity .55s cubic-bezier(.16,1,.3,1), transform .55s cubic-bezier(.16,1,.3,1); }
+        .reveal.visible { opacity:1; transform:none; }
+        .reveal-right { opacity:0; transform:translateX(20px); transition:opacity .55s cubic-bezier(.16,1,.3,1), transform .55s cubic-bezier(.16,1,.3,1); }
+        .reveal-right.visible { opacity:1; transform:none; }
+
+        /* ══ HERO ══ */
+        .exp-hero {
+            position:relative; overflow:hidden; padding:8rem 0 5rem;
+            background:linear-gradient(160deg, #0D2137 0%, #1A3A5C 45%, #2E6DA4 100%);
+            min-height:52vh; display:flex; align-items:flex-end;
+        }
+        .hero-dot-grid {
+            position:absolute; inset:0; pointer-events:none;
+            background-image:radial-gradient(circle, rgba(212,160,23,.18) 1.5px, transparent 1.5px);
+            background-size:28px 28px;
+            mask-image:radial-gradient(ellipse 60% 100% at 10% 50%, black 0%, transparent 70%);
+            -webkit-mask-image:radial-gradient(ellipse 60% 100% at 10% 50%, black 0%, transparent 70%);
+        }
+        .hero-glow {
+            position:absolute; right:-5%; top:-20%; width:500px; height:500px; border-radius:50%;
+            background:radial-gradient(circle, rgba(46,109,164,.18) 0%, transparent 65%); pointer-events:none;
+        }
+        .hero-cut {
+            position:absolute; bottom:-2px; left:0; right:0; height:60px;
+            background:var(--bg); clip-path:polygon(0 0, 100% 60%, 100% 100%, 0 100%);
+        }
+
+        /* ══ HERO COMPANY CARD ══ */
+        .hero-company-card {
+            display:inline-flex; align-items:flex-start; gap:1rem;
+            background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.12);
+            border-radius:14px; padding:.75rem 1.1rem; margin-bottom:1.5rem;
+            backdrop-filter:blur(8px);
+        }
+        .hero-logo {
+            width:48px; height:48px; border-radius:10px; flex-shrink:0;
+            background:rgba(255,255,255,.1); border:1px solid rgba(255,255,255,.15);
+            display:flex; align-items:center; justify-content:center; overflow:hidden;
+        }
+        .hero-logo img { width:100%; height:100%; object-fit:contain; padding:5px; }
+        .hero-logo-placeholder { font-family:'Roboto',sans-serif; font-weight:800; font-size:1.2rem; color:var(--gold); }
+        .hero-company-details { display:flex; flex-direction:column; gap:.5rem; min-width:0; }
+        .hero-company-image { width:100%; max-width:250px; overflow:hidden; border-radius:16px; }
+        .hero-company-image img { width:100%; height:auto; display:block; object-fit:cover; }
+        .hero-company-name { font-family:'Roboto',sans-serif; font-weight:800; font-size:1rem; color:var(--text); }
+        .hero-company-url { font-size:.78rem; color:var(--text-dim); text-decoration:none; transition:color .2s; }
+        .hero-company-url:hover { color:var(--gold); }
+
+        .section-label {
+            display:inline-flex; align-items:center; gap:.5rem; font-size:.72rem; font-weight:700;
+            text-transform:uppercase; letter-spacing:.16em; color:var(--gold); margin-bottom:.5rem;
+        }
+        .section-label::before { content:''; width:18px; height:2px; background:var(--gold); display:inline-block; }
+
+        .breadcrumb { display:flex; align-items:center; gap:.45rem; flex-wrap:wrap; margin-bottom:1.75rem; }
+        .breadcrumb a { font-family:'Roboto',sans-serif; font-weight:600; font-size:.75rem; color:var(--text-dim); text-decoration:none; text-transform:uppercase; letter-spacing:.06em; transition:color .2s; }
+        .breadcrumb a:hover { color:var(--gold); }
+        .breadcrumb-sep { color:var(--text-dim); font-size:.7rem; }
+        .breadcrumb-current { font-family:'Roboto',sans-serif; font-size:.75rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:.06em; }
+
+        /* Hero title */
+        .hero-title {
+            font-size:clamp(1.7rem,4.5vw,2.8rem);
+            font-weight:800;
+            line-height:1.35;
+            letter-spacing:-0.01em;
+            color:var(--text);
+            max-width:700px;
+            margin-top:.75rem;
+            margin-bottom:.25rem;
+        }
+
+        /* Hero badges */
+        .hero-badges { display:flex; flex-wrap:wrap; align-items:center; gap:.6rem; margin-top:1.4rem; }
+        .h-badge {
+            display:inline-flex; align-items:center; gap:.3rem;
+            font-family:'Roboto',sans-serif; font-weight:700; font-size:.68rem;
+            text-transform:uppercase; letter-spacing:.08em; padding:.28rem .75rem;
+            border-radius:999px; border:1.5px solid rgba(46,109,164,.3);
+            background:rgba(46,109,164,.15); color:#B8D6FF;
+        }
+        .h-badge.green { background:rgba(45,140,90,.15); border-color:rgba(45,140,90,.35); color:#5DD89A; }
+        .h-badge.gold { background:rgba(212,160,23,.1); border-color:rgba(212,160,23,.3); color:var(--gold); }
+
+        /* ══ CONTENT CARDS ══ */
+        .content-card {
+            background:var(--surface); border:1.5px solid var(--border);
+            border-radius:16px; padding:1.75rem 2rem; margin-bottom:1.5rem;
+        }
+        .content-card h2 {
+            font-size:1.05rem; font-weight:800; color:var(--text); margin-bottom:1.25rem;
+            display:flex; align-items:center; gap:.6rem;
+        }
+        .content-card h2::before { content:''; width:4px; height:18px; background:var(--gold); border-radius:2px; flex-shrink:0; }
+
+        /* Description */
+        .work-description {
+            font-size:.92rem; color:var(--text-muted); line-height:1.8;
+            white-space:pre-line;
+        }
+
+        /* ══ PROJECTS ══ */
+        .project-list { display:flex; flex-direction:column; gap:.85rem; }
+        .project-item {
+            padding:1.1rem 1.25rem; border-radius:12px; background:var(--bg2);
+            border:1px solid var(--border); transition:border-color .25s, transform .25s, box-shadow .25s;
+        }
+        .project-item:hover { border-color:rgba(46,109,164,.4); transform:translateX(4px); box-shadow:0 4px 16px rgba(46,109,164,.12); }
+        .project-header { display:flex; align-items:flex-start; justify-content:space-between; gap:.75rem; margin-bottom:.4rem; }
+        .project-title { font-weight:700; font-size:.95rem; color:var(--text); line-height:1.3; }
+        .project-period { font-size:.7rem; color:var(--text-dim); font-weight:600; white-space:nowrap; flex-shrink:0; }
+        .project-detail { font-size:.86rem; color:var(--text-muted); line-height:1.65; margin-bottom:.55rem; }
+        .project-type-chip {
+            font-size:.65rem; font-weight:700; text-transform:uppercase; letter-spacing:.06em;
+            padding:.15rem .55rem; border-radius:999px;
+            background:rgba(46,109,164,.12); color:#E5F0FF; border:1px solid rgba(46,109,164,.2);
+        }
+
+        /* ══ SKILLS ══ */
+        .skill-chip {
+            font-size:.78rem; font-weight:600; letter-spacing:.02em; padding:.3rem .8rem;
+            border-radius:999px; background:rgba(46,109,164,.12); color:#E5F0FF;
+            border:1px solid rgba(46,109,164,.2); transition:background .2s, color .2s;
+        }
+        .skill-chip:hover { background:#2E6DA4; color:#fff; }
+
+        /* ══ SIDEBAR ══ */
+        @media (min-width:1024px) { .detail-sidebar { position:sticky; top:6rem; } }
+
+        .meta-card {
+            background:var(--surface); border:1.5px solid var(--border);
+            border-radius:16px; padding:1.4rem; margin-bottom:1.25rem;
+        }
+        .meta-card h3 { font-size:.88rem; font-weight:800; color:var(--text); margin-bottom:1rem; letter-spacing:.02em; }
+
+        .meta-row {
+            display:flex; align-items:flex-start; gap:.75rem;
+            padding:.6rem 0; border-bottom:1px solid rgba(196,144,15,.08);
+        }
+        .meta-row:last-child { border-bottom:none; padding-bottom:0; }
+        .meta-icon {
+            width:34px; height:34px; border-radius:8px; background:var(--bg2);
+            border:1px solid var(--border); display:flex; align-items:center;
+            justify-content:center; font-size:.95rem; flex-shrink:0;
+        }
+        .meta-label { font-size:.63rem; font-weight:700; text-transform:uppercase; letter-spacing:.1em; color:var(--text-dim); margin-bottom:.15rem; }
+        .meta-value { font-size:.87rem; font-weight:600; color:var(--text); }
+        .meta-value.active { color:#5DD89A; }
+
+        /* ══ BUTTONS ══ */
+        .btn-primary {
+            background:#2E6DA4; color:#fff; font-family:'Roboto',sans-serif; font-weight:700;
+            border-radius:10px; padding:.7rem 1.4rem; transition:all .2s;
+            display:inline-flex; align-items:center; justify-content:center; gap:.5rem;
+            text-decoration:none; font-size:.85rem;
+        }
+        .btn-primary:hover { background:#1f4a7a; transform:translateY(-2px); box-shadow:0 8px 24px rgba(46,109,164,.3); }
+        .btn-outline {
+            border:1.5px solid var(--border2); color:var(--text-muted); font-family:'Roboto',sans-serif;
+            font-weight:700; border-radius:10px; padding:.7rem 1.4rem; transition:all .2s;
+            display:inline-flex; align-items:center; justify-content:center; gap:.5rem;
+            text-decoration:none; background:transparent; font-size:.85rem;
+        }
+        .btn-outline:hover { border-color:var(--gold); color:var(--gold); background:var(--gold-glow); transform:translateY(-2px); }
+        .btn-gold {
+            background:var(--gold); color:var(--navy); font-family:'Roboto',sans-serif; font-weight:800;
+            border-radius:10px; padding:.7rem 1.4rem; transition:all .2s;
+            display:inline-flex; align-items:center; justify-content:center; gap:.5rem;
+            text-decoration:none; font-size:.85rem;
+        }
+        .btn-gold:hover { background:var(--gold-light); transform:translateY(-2px); box-shadow:0 8px 24px rgba(212,160,23,.3); }
+
+        /* ══ PREV / NEXT ══ */
+        .nav-exp-card {
+            background:var(--surface); border:1.5px solid var(--border); border-radius:14px;
+            padding:1.1rem 1.25rem; text-decoration:none; display:block; color:inherit;
+            transition:border-color .25s, transform .25s, box-shadow .25s; flex:1;
+        }
+        .nav-exp-card:hover { border-color:var(--border2); transform:translateY(-3px); box-shadow:0 8px 24px rgba(196,144,15,.1); }
+
+        /* ══ MOBILE NAV ══ */
+        #mobile-nav { position:fixed; top:0; left:0; right:0; z-index:200; display:none; align-items:center; justify-content:space-between; padding:.85rem 1.25rem; background:rgba(13,33,55,.96); backdrop-filter:blur(16px); border-bottom:1px solid rgba(46,109,164,.25); }
+        .mobile-logo { font-family:'Roboto',sans-serif; font-weight:800; font-size:1rem; color:#B8D6FF; }
+        #hamburger { width:36px; height:36px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:5px; cursor:pointer; background:rgba(46,109,164,.12); border:1px solid rgba(72,128,187,.28); border-radius:8px; padding:0; }
+        #hamburger span { display:block; width:18px; height:1.5px; background:#E5F0FF; border-radius:2px; transition:transform .25s, opacity .25s; }
+        #hamburger.open span:nth-child(1) { transform:translateY(6.5px) rotate(45deg); }
+        #hamburger.open span:nth-child(2) { opacity:0; }
+        #hamburger.open span:nth-child(3) { transform:translateY(-6.5px) rotate(-45deg); }
+        #mobile-drawer { position:fixed; top:57px; left:0; right:0; bottom:0; z-index:199; background:rgba(13,33,55,.97); backdrop-filter:blur(24px); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:.5rem; opacity:0; pointer-events:none; transition:opacity .25s; }
+        #mobile-drawer.open { opacity:1; pointer-events:auto; }
+        .mobile-link { font-family:'Roboto',sans-serif; font-weight:700; font-size:1.7rem; color:rgba(255,255,255,.85); text-decoration:none; padding:.5rem 2.5rem; border-radius:10px; transition:color .2s, background .2s; }
+        .mobile-link:hover, .mobile-link.active { color:#fff; background:rgba(46,109,164,.35); }
+        @media (max-width:767px) { #topnav { display:none !important; } #mobile-nav { display:flex; } }
+        @media (min-width:768px) { #mobile-nav { display:none !important; } #mobile-drawer { display:none !important; } }
+        @media (max-width:767px) { .exp-hero { padding:6rem 0 4rem; min-height:auto; } }
+        @media (max-width:640px) {
+            .hero-title { max-width:100%; font-size:clamp(1.5rem,7vw,2rem); }
+        }
+    </style>
+</head>
+<body>
+
+    {% include 'navbar.html' %}
+
+    <!-- ══ HERO ══ -->
+    <header class="exp-hero">
+        <div class="hero-dot-grid"></div>
+        <div class="hero-glow"></div>
+        <div class="container mx-auto px-5 sm:px-6 relative w-full" style="z-index:1">
+
+            <nav class="breadcrumb">
+                <a href="/">Home</a>
+                <span class="breadcrumb-sep">/</span>
+                <a href="/works/">Works</a>
+                <span class="breadcrumb-sep">/</span>
+                <span class="breadcrumb-current">{{ work.title|truncatechars:30 }}</span>
+            </nav>
+
+            <!-- Company card in hero -->
+            {% if work.image_link %}
+            <div class="hero-company-image">
+                <img src="{{ work.image_link }}" alt="{{ work.company_name }} image">
+            </div>
+            {% else %}
+            <div class="hero-logo">
+                <span class="hero-logo-placeholder">{{ work.company_name|first|upper }}</span>
+            </div>
+            {% endif %}
+
+            <div class="section-label">{{ work.type|default:"Work Experience" }}</div>
+            <h1 class="hero-title">
+                {{ work.title }}
+            </h1>
+
+            <div class="hero-badges">
+                {% if work.is_current %}
+                <span class="h-badge green">● Currently Working Here</span>
+                {% endif %}
+                {% if work.employement_type %}
+                <span class="h-badge">{{ work.employement_type }}</span>
+                {% endif %}
+                {% if work.location %}
+                <span class="h-badge gold">
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                    {{ work.location }}
+                </span>
+                {% endif %}
+                <span class="h-badge">
+                    📅 {{ work.start_date|date:"M Y" }} –
+                    {% if work.is_current %}Present{% elif work.end_date %}{{ work.end_date|date:"M Y" }}{% else %}Present{% endif %}
+                </span>
+            </div>
+        </div>
+        <div class="hero-cut"></div>
+    </header>
+
+    <!-- ══ MAIN ══ -->
+    <main class="container mx-auto px-5 sm:px-6 py-14" style="position:relative;z-index:1">
+        <div class="grid lg:grid-cols-3 gap-8">
+
+            <!-- ══ LEFT CONTENT ══ -->
+            <div class="lg:col-span-2 flex flex-col">
+
+                <!-- Description -->
+                {% if work.description %}
+                <div class="content-card reveal" style="transition-delay:.0s">
+                    <h2>About This Role</h2>
+                    <p class="work-description">{{ work.description }}</p>
+                </div>
+                {% endif %}
+
+                <!-- Projects -->
+                {% if work.projectsunderworks_set.all %}
+                <div class="content-card reveal" style="transition-delay:.05s">
+                    <h2>Projects</h2>
+                    <div class="project-list">
+                        {% for project in work.projectsunderworks_set.all %}
+                        <div class="project-item reveal" style="transition-delay:{{ forloop.counter0 }}00ms">
+                            <div class="project-header">
+                                <div class="project-title">{{ project.title }}</div>
+                                {% if project.start_date %}
+                                <span class="project-period">
+                                    {{ project.start_date|date:"M Y" }}{% if project.end_date %} – {{ project.end_date|date:"M Y" }}{% endif %}
+                                </span>
+                                {% endif %}
+                            </div>
+                            {% if project.detail %}
+                            <div class="project-detail">{{ project.detail }}</div>
+                            {% endif %}
+                            {% if project.type %}
+                            <span class="project-type-chip">{{ project.type }}</span>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Skills -->
+                {% if work.skills.all %}
+                <div class="content-card reveal" style="transition-delay:.1s">
+                    <h2>Skills & Technologies</h2>
+                    <div style="display:flex;flex-wrap:wrap;gap:.5rem">
+                        {% for skill in work.skills.all %}
+                        <span class="skill-chip">{{ skill.name }}</span>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Prev / Next -->
+                {% if prev_work or next_work %}
+                <div style="display:flex;gap:1rem;flex-wrap:wrap;margin-top:.5rem" class="reveal">
+                    {% if prev_work %}
+                    <a href="/works/{{ prev_work.id }}/" class="nav-exp-card">
+                        <div style="font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--text-dim);margin-bottom:.4rem">← Previous</div>
+                        <div style="font-weight:700;font-size:.9rem;color:var(--text)">{{ prev_work.title }}</div>
+                        {% if prev_work.company_name %}<div style="font-size:.75rem;color:var(--text-dim);margin-top:.2rem">{{ prev_work.company_name }}</div>{% endif %}
+                    </a>
+                    {% endif %}
+                    {% if next_work %}
+                    <a href="/works/{{ next_work.id }}/" class="nav-exp-card" style="text-align:right">
+                        <div style="font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--text-dim);margin-bottom:.4rem">Next →</div>
+                        <div style="font-weight:700;font-size:.9rem;color:var(--text)">{{ next_work.title }}</div>
+                        {% if next_work.company_name %}<div style="font-size:.75rem;color:var(--text-dim);margin-top:.2rem">{{ next_work.company_name }}</div>{% endif %}
+                    </a>
+                    {% endif %}
+                </div>
+                {% endif %}
+
+            </div>
+
+            <!-- ══ SIDEBAR ══ -->
+            <aside class="detail-sidebar flex flex-col gap-0">
+
+                <!-- Work Details (info yang belum ada di hero) -->
+                <div class="meta-card reveal reveal-right">
+                    <h3>Work Details</h3>
+
+                    {% if work.type %}
+                    <div class="meta-row">
+                        <div class="meta-icon">🏷️</div>
+                        <div>
+                            <div class="meta-label">Category</div>
+                            <div class="meta-value">{{ work.type }}</div>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <div class="meta-row">
+                        <div class="meta-icon">⚡</div>
+                        <div>
+                            <div class="meta-label">Status</div>
+                            <div class="meta-value {% if work.is_current %}active{% endif %}">
+                                {% if work.is_current %}● Active{% else %}Completed{% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    {% if work.projectsunderworks_set.count %}
+                    <div class="meta-row">
+                        <div class="meta-icon">📁</div>
+                        <div>
+                            <div class="meta-label">Projects</div>
+                            <div class="meta-value">{{ work.projectsunderworks_set.count }} projects</div>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {% if work.skills.count %}
+                    <div class="meta-row">
+                        <div class="meta-icon">⚙️</div>
+                        <div>
+                            <div class="meta-label">Skills Used</div>
+                            <div class="meta-value">{{ work.skills.count }} skills</div>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                </div>
+
+                <!-- Actions -->
+                <div class="meta-card reveal reveal-right" style="transition-delay:.1s">
+                    <h3>Actions</h3>
+                    <div style="display:flex;flex-direction:column;gap:.6rem">
+                        <a href="/works/" class="btn-outline">
+                            ← All Experience
+                        </a>
+                        {% if work.company_url %}
+                        <a href="{{ work.company_url }}" target="_blank" rel="noopener" class="btn-primary">
+                            🌐 Visit Company
+                        </a>
+                        {% endif %}
+                        {% if work.document_link %}
+                        <a href="{{ work.document_link }}" target="_blank" rel="noopener" class="btn-gold">
+                            📄 View Document
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Skills cloud -->
+                {% if work.skills.all %}
+                <div class="meta-card reveal reveal-right" style="transition-delay:.2s">
+                    <h3>Technologies</h3>
+                    <div style="display:flex;flex-wrap:wrap;gap:.4rem">
+                        {% for skill in work.skills.all %}
+                        <span class="skill-chip" style="font-size:.72rem;padding:.22rem .65rem">{{ skill.name }}</span>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+
+            </aside>
+        </div>
+    </main>
+
+    {% include 'footer.html' %}
+
+    <script>
+    const io = new IntersectionObserver(entries => {
+        entries.forEach(e => { if(e.isIntersecting){ e.target.classList.add('visible'); io.unobserve(e.target); } });
+    }, { threshold:0.07 });
+    document.querySelectorAll('.reveal,.reveal-right').forEach(el => io.observe(el));
+
+    const hamburger = document.getElementById('hamburger');
+    const drawer    = document.getElementById('mobile-drawer');
+    if (hamburger && drawer) {
+        hamburger.addEventListener('click', () => {
+            const open = drawer.classList.toggle('open');
+            hamburger.classList.toggle('open', open);
+            hamburger.setAttribute('aria-expanded', String(open));
+            document.body.style.overflow = open ? 'hidden' : '';
+        });
+        drawer.querySelectorAll('.mobile-link').forEach(l => l.addEventListener('click', () => {
+            drawer.classList.remove('open');
+            hamburger.classList.remove('open');
+            hamburger.setAttribute('aria-expanded','false');
+            document.body.style.overflow = '';
+        }));
+    }
+    </script>
+</body>
+</html>
