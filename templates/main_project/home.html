@@ -727,7 +727,7 @@
                 <!-- Quick facts + at-a-glance stats -->
                 <div class="reveal-right">
                     <div class="grid grid-cols-2 gap-3">
-                        {% for stat in cv.stats %}
+                        {% for stat in stats %}
                         <div style="background:#fff;border:1px solid rgba(13,33,55,.08);border-radius:12px;padding:1rem;text-align:center">
                             <div class="font-display font-bold" style="font-size:1.4rem;color:var(--gold)">{{ stat.value }}</div>
                             <div class="text-xs text-gray-500 mt-1">{{ stat.label }}</div>

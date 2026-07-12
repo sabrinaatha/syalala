@@ -50,11 +50,18 @@ def home(request):
         .order_by('type', 'skills_name')
     )
 
+    stats = [
+        {'label': 'Projects', 'value': projects_qs.count()},
+        {'label': 'Experience', 'value': works_qs.count()},
+        {'label': 'Skills', 'value': skills_qs.count()},
+    ]
+
     return render(request, 'main_project/home.html', {
         'cv': cv_data,
         'works': works_qs,
         'projects': projects_qs,
         'skills': skills_qs,
+        'stats': stats,
         'active_page': 'home',
         'contact_status': request.GET.get('contact')
     })
