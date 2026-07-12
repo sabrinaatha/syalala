@@ -2,3 +2,16 @@ django>=4.2
 python-dotenv
 pillow
 psycopg2-binary
+asgiref==3.11.1
+dj-database-url==3.0.1
+Django==4.2.30
+environ==1.0
+gunicorn==23.0.0
+packaging==26.2
+pillow==11.3.0
+psycopg2-binary==2.9.12
+python-decouple==3.8
+python-dotenv==1.2.1
+sqlparse==0.5.5
+typing_extensions==4.15.0
+whitenoise==6.11.0
